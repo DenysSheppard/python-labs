@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Кінотеатр - Інформаційна система</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+        }
+        .student-info {
+            text-align: center;
+            font-style: italic;
+            color: #007bff;
+            margin: 20px 0;
+            font-size: 18px;
+        }
+        h2 {
+            color: #555;
+            margin-top: 30px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #ddd;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+            box-shadow: 0 0 5px rgba(0,0,0,0.1);
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+            font-weight: bold;
+            padding: 12px;
+            text-align: left;
+        }
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        tr:hover {
+            background-color: #e9ecef;
+        }
+        .table-container {
+            overflow-x: auto;
+        }
+        .admin-link {
+            display: inline-block;
+            margin: 20px 0;
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .admin-link:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Кінотеатр - Інформаційна система</h1>
+        
+        <div class="student-info">
+            {{ student_info.name }}, {{ student_info.group }}
+        </div>
+        
+        <a href="/admin/" class="admin-link">Перейти до адміністративної панелі</a>
+        
+        {% for table_name, table_data in tables.items %}
+            <h2>Таблиця: {{ table_name|title }}</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            {% for header in table_data.headers %}
+                                <th>{{ header }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in table_data.rows %}
+                            <tr>
+                                {% for cell in row %}
+                                    <td>
+                                        {% if cell %}
+                                            {{ cell }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                {% endfor %}
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="{{ table_data.headers|length }}" style="text-align: center;">
+                                    Немає даних
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endfor %}
+    </div>
+</body>
+</html>

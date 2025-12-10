@@ -1,0 +1,73 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: cinema_db
+    restart: always
+    environment:
+      POSTGRES_USER: cinema_admin
+      POSTGRES_PASSWORD: cinema_password
+      POSTGRES_DB: cinema_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - cinema_network
+
+  web:
+    build: .
+    container_name: cinema_django
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_HOST=db
+      - DATABASE_PORT=5432
+      - DATABASE_NAME=cinema_db
+      - DATABASE_USER=cinema_admin
+      - DATABASE_PASSWORD=cinema_password
+    networks:
+      - cinema_network
+    depends_on:
+      - db
+    command: >
+      bash -c "
+        echo 'Очікування запуску бази даних...' &&
+        sleep 15 &&
+        echo 'Застосування міграцій Django...' &&
+        python manage.py makemigrations --noinput &&
+        python manage.py migrate --noinput &&
+        echo 'Створення суперкористувача...' &&
+        echo \"from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.filter(username='admin').exists() or User.objects.create_superuser('admin', 'admin@example.com', 'admin123')\" | python manage.py shell &&
+        echo 'Завантаження тестових даних...' &&
+        python load_data.py &&
+        echo 'Запуск Django сервера...' &&
+        python manage.py runserver 0.0.0.0:8000
+      "
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: cinema_pgadmin
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@cinema.com
+      PGADMIN_DEFAULT_PASSWORD: admin_password
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    networks:
+      - cinema_network
+    depends_on:
+      - db
+
+volumes:
+  postgres_data:
+  pgadmin_data:
+
+networks:
+  cinema_network:
+    driver: bridge
