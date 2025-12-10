@@ -1,0 +1,9 @@
+{
+    "input_file": "sample_text.txt",
+    "target_language": "uk",
+    "translation_module": "google_translator_v4",
+    "output_destination": "file",
+    "max_chars": 600,
+    "max_words": 100,
+    "max_sentences": 5
+}
